@@ -1,46 +1,36 @@
-# Symfony Docker
+# MERCURE LEARNING
 
-A [Docker](https://www.docker.com/)-based installer and runtime for the [Symfony](https://symfony.com) web framework, with full [HTTP/2](https://symfony.com/doc/current/weblink.html), HTTP/3 and HTTPS support.
+Application of the [documentation from symfony concerning mercure](https://symfony.com/doc/current/mercure.html)
 
-![CI](https://github.com/dunglas/symfony-docker/workflows/CI/badge.svg)
+It uses the [docker integration from dunglas (symfony-docker)](https://github.com/dunglas/symfony-docker) with :
+* [mercure-bundle](https://github.com/symfony/mercure-bundle) : the current tested bundle
+* [webpack-encore-bundle](https://github.com/symfony/webpack-encore-bundle) : to have a cleaner JS/CSS integration
+* [bulma.io](https://bulma.io/) : to have ready-to-uses CSS components
+
+## What is Mercure ?
+
+From the [doc](https://symfony.com/doc/current/mercure.html) :
+
+> Mercure is an open protocol designed from the ground up to publish updates from server to clients. 
+> It is a modern and efficient alternative to timer-based polling and to WebSocket.
 
 ## Getting Started
 
-1. If not already done, [install Docker Compose](https://docs.docker.com/compose/install/) (v2.10+)
-2. Run `docker compose build --pull --no-cache` to build fresh images
-3. Run `docker compose up` (the logs will be displayed in the current shell)
-4. Open `https://localhost` in your favorite web browser and [accept the auto-generated TLS certificate](https://stackoverflow.com/a/15076602/1352334)
-5. Run `docker compose down --remove-orphans` to stop the Docker containers.
+From [symfony-docker](https://github.com/dunglas/symfony-docker) : 
 
-## Features
+> 1. If not already done, [install Docker Compose](https://docs.docker.com/compose/install/) (v2.10+)
+> 2. Run `docker compose build --pull --no-cache` to build fresh images
+> 3. Run `docker compose up` (the logs will be displayed in the current shell)
+> 4. Open `https://localhost` in your favorite web browser and [accept the auto-generated TLS certificate](https://stackoverflow.com/a/15076602/1352334)
+> 5. Run `docker compose down --remove-orphans` to stop the Docker containers.
 
-* Production, development and CI ready
-* [Installation of extra Docker Compose services](docs/extra-services.md) with Symfony Flex
-* Automatic HTTPS (in dev and in prod!)
-* HTTP/2, HTTP/3 and [Preload](https://symfony.com/doc/current/web_link.html) support
-* Built-in [Mercure](https://symfony.com/doc/current/mercure.html) hub
-* [Vulcain](https://vulcain.rocks) support
-* Native [XDebug](docs/xdebug.md) integration
-* Just 2 services (PHP FPM and Caddy server)
-* Super-readable configuration
+## What has been done here? 
 
-**Enjoy!**
-
-## Docs
-
-1. [Build options](docs/build.md)
-2. [Using Symfony Docker with an existing project](docs/existing-project.md)
-3. [Support for extra services](docs/extra-services.md)
-4. [Deploying in production](docs/production.md)
-5. [Debugging with Xdebug](docs/xdebug.md)
-6. [TLS Certificates](docs/tls.md)
-7. [Using a Makefile](docs/makefile.md)
-8. [Troubleshooting](docs/troubleshooting.md)
+1. Simple subscription 
+2. Multiple subscriptions 
+3. Simple subscription (using discover mechanism) 
+4. Private subscription 
 
 ## License
 
-Symfony Docker is available under the MIT License.
-
-## Credits
-
-Created by [Kévin Dunglas](https://dunglas.fr), co-maintained by [Maxime Helias](https://twitter.com/maxhelias) and sponsored by [Les-Tilleuls.coop](https://les-tilleuls.coop).
+MIT License.
