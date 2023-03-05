@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Page d'accueil
+{% endblock title %}
+
+{% block content %}
+  <header class="hero is-medium is-primary">
+    <div class="hero-body">
+      <p class="title">Accueil</p>
+      <p class="subtitle">Hello world</p>
+    </div>
+  </header>
+  <section class="container">
+    <div class="columns is-multiline">
+      <div class="column is-full">
+        <div class="notification is-info">
+          Topic mercure (Book 1):
+          {{ mercure('https://example.com/books/1')
+          |json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG'))|raw -}}
+        </div>
+        <div class="notification is-info">
+          Topic mercure (Book 2):
+          {{ mercure('https://example.com/books/2')
+          |json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG'))|raw -}}
+        </div>
+      </div>
+
+      <div class="column">
+        <ul>
+          {% for id in 1..3 %}
+            <li class="mb-4">
+              Etat de https://example.com/books/{{ id }} :
+              <strong id="books-1" data-book-id="{{ id }}">???</strong>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="column">
+        <ul>
+          {% for id in 1..3 %}
+            <li class="mb-4">
+              <ul>
+                <li>
+                  <a href="{{ path('book_status', { id, status: 'out-of-stock' }) }}" target="_blank">
+                    https://example.com/books/{{ id }} : Out of stock.
+                  </a>
+                </li>
+                <li>
+                  <a href="{{ path('book_status', { id, status: 'available' }) }}" target="_blank">
+                    https://example.com/books/{{ id }}: Available
+                  </a>
+                </li>
+              </ul>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </section>
+{% endblock content %}
+{% block javascript %}
+<script>
+  // Simple subscribing
+  const eventSource = new EventSource("{{ mercure('https://example.com/books/1')|escape('js') }}");
+  const firstBookStatus = document.getElementById("books-1");
+
+  eventSource.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    firstBookStatus.innerHTML = data.status;
+  };
+
+  // Multiple subscribing subscribing
+  const bookStatus = Array.from(document.querySelectorAll("[data-book-id]"));
+  const eventSources = new EventSource("{{ mercure([
+    'https://example.com/books/2',
+    'https://example.com/books/3',
+    ])|escape('js') }}");
+
+
+  eventSources.onmessage = (event) => {
+    const {id, status} = JSON.parse(event.data);
+
+    const book = bookStatus.filter((book) => parseInt(book.dataset.bookId, 10) === id).pop();
+    if (book) book.innerHTML = status;
+  };
+</script>
+{% endblock %}
