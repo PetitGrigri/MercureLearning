@@ -1,5 +1,7 @@
 version: "3.4"
 
+name: mercure-learning
+
 # Development environment override
 services:
   php:
@@ -29,3 +31,11 @@ services:
     ports:
       - "80"
 ###< symfony/mercure-bundle ###
+
+  node:
+    build:
+      target: app_node
+    volumes:
+      - ./:/srv/app
+    command: sh -c "yarn install && yarn run watch"
+      
