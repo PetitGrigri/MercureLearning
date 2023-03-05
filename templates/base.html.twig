@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html lang="fr">
-    <head>
-        {% block head %}
-            <title>{% block title %}{% endblock %}</title>
-        {% endblock %}
+<html lang="fr" class="has-navbar-fixed-top">
+<head>
+  {% block head %}
+    <title>{% block title %}{% endblock %}</title>
+  {% endblock %}
 
-        {{ encore_entry_link_tags('app') }}
+  {{ encore_entry_link_tags('app') }}
+  {% block stylesheet %}{% endblock stylesheet %}
+</head>
+<body>
 
-        {% block stylesheet %}{% endblock stylesheet %}
-    </head>
-    <body>
-        {% block content %}{% endblock content %}
+{% include 'block/navbar.html.twig' %}
+{% block content %}{% endblock content %}
 
-        {% block javascript %}
-
-        {% endblock javascript %}
-    </body>
+{{ encore_entry_script_tags('app') }}
+{% block javascript %}{% endblock javascript %}
+</body>
 </html>

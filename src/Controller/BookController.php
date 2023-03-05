@@ -8,19 +8,53 @@ use Symfony\Component\Mercure\Hub;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class BookController extends AbstractController
 {
     const AVAILABLE_STATUS = ['InStock', 'OutOfStock'];
 
     /**
-     * This method is used to update the status of a PRIVATE book
+     * This method will return the information concerning a book
+     */
+    #[Route(path: '/books/{id}', name: 'get_book', requirements: [
+        'id' => '\d+',
+        'status' => 'in-stock|out-of-stock'
+    ])]
+    public function getBook(
+        int $id
+    ): Response {
+        return $this->json([
+            'id' => $id,
+            'status' => self::AVAILABLE_STATUS[array_rand(self::AVAILABLE_STATUS)],
+        ]);
+    }
+
+    /**
+     * This method will return the information concerning a book
+     */
+    #[Route(path: '/private-books/{id}', name: 'get_private_book', requirements: [
+        'id' => '\d+',
+        'status' => 'in-stock|out-of-stock'
+    ])]
+    public function getPrivateBook(
+        int $id
+    ): Response {
+        return $this->json([
+            'id' => $id,
+            'status' => self::AVAILABLE_STATUS[array_rand(self::AVAILABLE_STATUS)],
+        ]);
+    }
+
+    /**
+     * This method is used to update the status of a PUBLIC book
      *
-     * We are able to publish our update in this method because the hub, will use the JWT
+     * We are able to publish our update with this method because the mercure use the JWT
      * configured in the {@see config/packages/mercure.yaml}
      * This JWT Publisher must contain the published topic or '*'
+     *
      * @example { "mercure": { "publish" : ["*"] } }
-     * @example { "mercure": { "publish" : ["https://example.com/private-books/__BOOK_ID__"] } }
+     * @example { "mercure": { "publish" : ["https://localhost/books/__BOOK_ID__"] } }
      *          (__BOOK_ID__ is replaced by the current book id)
      *
      *
@@ -35,8 +69,10 @@ class BookController extends AbstractController
         int $id,
         string $status,
     ): Response {
+        $topic = $this->generateUrl('get_book', ['id' => 1], UrlGeneratorInterface::ABSOLUTE_URL);
+
         $update = new Update(
-            topics: sprintf('https://example.com/books/%s', $id),
+            topics: $topic,
             data: json_encode([
                 'id' => $id,
                 'status' => match ($status) {
@@ -44,7 +80,8 @@ class BookController extends AbstractController
                     'out-of-stock' => 'OutOfStock',
                     default => 'Unknown'
                 }
-            ])
+            ]),
+            private: false,
         );
         $hub->publish($update);
 
@@ -58,7 +95,7 @@ class BookController extends AbstractController
      * configured in the {@see config/packages/mercure.yaml}
      * This JWT Publisher must contain the published topic or '*'
      * @example { "mercure": { "publish" : ["*"] } }
-     * @example { "mercure": { "publish" : ["https://example.com/private-books/__BOOK_ID__"] } }
+     * @example { "mercure": { "publish" : ["https://localhost/private-books/__BOOK_ID__"] } }
      *          (__BOOK_ID__ is replaced by the current book id)
      *
      * By indicating that the Update is private, a subscriber can only access to the private topic if he is allowed :
@@ -82,8 +119,14 @@ class BookController extends AbstractController
         string $status,
     ): Response {
 
+        $topic = $this->generateUrl(
+            'get_private_book',
+            ['id' => $id],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
         $update = new Update(
-            topics: sprintf('https://example.com/private-books/%s', $id),
+            topics: $topic,
             data: json_encode([
                 'id' => $id,
                 'status' => match ($status) {
@@ -98,22 +141,5 @@ class BookController extends AbstractController
         $hub->publish($update);
 
         return new Response(null, Response::HTTP_NO_CONTENT);
-    }
-
-    /**
-     * This method will return the information concerning a book
-     */
-    #[Route(path: '/books/{id}', name: 'get_book', requirements: [
-        'id' => '\d+',
-        'status' => 'in-stock|out-of-stock'
-    ])]
-    public function getBook(
-        HubInterface $hub,
-        int $id
-    ): Response {
-        return $this->json([
-            'id' => $id,
-            'status' => self::AVAILABLE_STATUS[array_rand(self::AVAILABLE_STATUS)],
-        ]);
     }
 }

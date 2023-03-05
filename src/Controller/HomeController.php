@@ -10,18 +10,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class HomeController extends AbstractController
 {
-    #[Route(path:'/')]
-    public function home(
-        Authorization $authorization,
-        Request $request,
-    ) : Response {
-        /**
-         * Authorization will be used to send a specific 'mercureAuthorization' cookie.
-         *  This Cookie will be used for private topics
-         * {@see BookController::updatePrivateBookStatus} for more information
-         */
-        $authorization->setCookie($request, ['*']);
-
+    #[Route(path:'/', name: 'home')]
+    public function home() : Response {
         return $this->render('screens/home.html.twig');
 
     }

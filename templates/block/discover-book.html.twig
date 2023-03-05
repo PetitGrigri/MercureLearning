@@ -1,0 +1,45 @@
+{% if discover_url|default('') is not empty and id|default('') is not empty%}
+  <article
+    class="box content"
+    id="{{ id }}"
+    data-discover-url="{{ discover_url }}"
+    data-mercure-hub=""
+  >
+    <dl>
+      <dt class="has-text-weight-bold">Discover URL : </dt>
+      <dd><code>{{ discover_url }}</code></dd>
+
+      <dt class="has-text-weight-bold">Mercure Hub URL (header coming from discover endpoint) : </dt>
+      <dd><code data-discover-hub-url>Unknown</code></dd>
+
+      <dt class="has-text-weight-bold">Discover Content (coming from discover endpoint)</dt>
+      <dd><code data-discover-content>Unknown</code></dd>
+
+      <dt class="has-text-weight-bold">Topic (coming from discover endpoint)</dt>
+      <dd><code data-discover-topic-url>Unknown</code></dd>
+
+      <dt class="has-text-weight-bold">Subscription URL (coming from discover endpoint)</dt>
+      <dd><code data-discover-subscripion-url>Unknown</code></dd>
+
+      <dt class="has-text-weight-bold">Book status</dt>
+      <dd><code data-discover-book-status>Unknown</code></dd>
+    </dl>
+
+    <div class="buttons has-addons">
+      <button
+        class="button is-danger"
+        data-controller="button"
+        data-target="{{ path('book_status', { 'id': 1, 'status': 'out-of-stock' }) }}"
+      >
+        Out of stock
+      </button>
+      <button
+        class="button is-success"
+        data-controller="button"
+        data-target="{{ path('book_status', { 'id': 1, status: 'in-stock' }) }}"
+      >
+        In Stock
+      </button>
+    </div>
+  </article>
+{% endif %}

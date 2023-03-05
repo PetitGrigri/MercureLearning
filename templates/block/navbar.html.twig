@@ -1,0 +1,53 @@
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation" data-controller="navbar">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="{{ path('home') }}">
+      <!-- image from : https://www.flaticon.com/free-icon/graduation-hat_422 -->
+      <img src="{{ asset('build/images/learning.png') }}" width="32" height="32" alt="Learning Logo">
+    </a>
+
+    <a
+      role="button"
+      class="navbar-burger"
+      aria-label="menu"
+      aria-expanded="false"
+      data-target="navbarBasicExample"
+      data-action="click->navbar#toggleMenu"
+    >
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+
+  <div class="navbar-menu" data-navbar-target="menu">
+    <div class="navbar-start">
+      <a class="navbar-item" href="{{ path('home') }}">
+        Home
+      </a>
+
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+          Mercure Learning
+        </a>
+        <div class="navbar-dropdown">
+          <a class="navbar-item" href="{{ path('simple_subscription') }}">
+            Simple Subscription
+          </a>
+          <a class="navbar-item" href="{{ path('multiple_subscriptions') }}">
+            Multiple Subscriptions
+          </a>
+
+          <hr class="navbar-divider">
+          <a class="navbar-item" href="{{ path('simple_subscription_discover') }}">
+            Simple subscription (with discover)
+          </a>
+
+          <hr class="navbar-divider">
+          <a class="navbar-item" href="{{ path('private_subscription') }}">
+            Private Subscription
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

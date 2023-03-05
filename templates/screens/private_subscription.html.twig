@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Page d'accueil{% endblock title %}
+
+{% block content %}
+
+  {% set first_private_book_topic = absolute_url(path('get_private_book', {id: 1})) %}
+  {% set second_private_book_topic = absolute_url(path('get_private_book', {id: 2})) %}
+
+  <header class="hero is-medium is-primary">
+    <div class="hero-body">
+      <h1 class="title">Private Subscription</h1>
+      <p>
+        Example to show a suscription to a private topic (the first book subscription is allowed contrary to the second)
+      </p>
+      <p>Private allowed subscription to the topic : <code>{{ first_private_book_topic }}</code></p>
+      <p>Private <strong>not-allowed</strong> subscription to the topic : <code>{{ second_private_book_topic }}</code></p>
+    </div>
+  </header>
+  <section class="container mb-6 px-3">
+    {# Information about the subscribed URL, discovery URL or fake API URL #}
+    <h2 class="title is-5 my-4">Book subscription urls : </h2>
+    <div class="columns is-multiline">
+      <div class="column is-full">
+        <div class="notification is-info mt-4">
+          <dl>
+            <dt class="has-text-weight-bold">
+              Private <span class="is-underlined">allowed</span> book 1
+              (<a href="{{ path('discover_private_book', {'id': 1}) }}">jsonld</a> |
+              <a href="{{ first_private_book_topic }}">API</a>):
+            </dt>
+            <dd>
+              <code>
+                {{- mercure(first_private_book_topic)|json_encode(
+                  constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG')
+                )|raw -}}
+              </code>
+            </dd>
+
+            <dt class="has-text-weight-bold mt-4">
+              Private <span class="is-underlined">not-allowed</span> book 2
+              (<a href="{{ path('discover_private_book', {'id': 2}) }}">jsonld</a> |
+              <a href="{{ second_private_book_topic }}">API</a>):
+            </dt>
+            <dd>
+              <code>
+                {{- mercure(second_private_book_topic)|json_encode(
+                  constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG')
+                )|raw -}}
+              </code>
+            </dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    {# The Public Books (status and links #}
+    <h2 class="title is-5 my-4">Private books: </h2>
+
+    <div class="columns">
+      <div class="column">
+        {% include 'block/private-book.html.twig' with {'id': 1, topic: first_private_book_topic} %}
+      </div>
+      <div class="column">
+        {% include 'block/private-book.html.twig' with {'id': 2, topic: second_private_book_topic } %}
+      </div>
+    </div>
+  </section>
+{% endblock content %}
+
+
+{% block javascript %}
+{{ encore_entry_script_tags('screens/private-subscription') }}
+{% endblock %}

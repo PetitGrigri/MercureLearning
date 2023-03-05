@@ -1,163 +1,21 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Page d'accueil
-{% endblock title %}
+{% block title %}Page d'accueil{% endblock title %}
 
 {% block content %}
-  <header class="hero is-medium is-primary">
+    <header class="hero is-medium is-primary">
     <div class="hero-body">
-      <h1 class="title">Accueil</h1>
-      <p class="subtitle">Hello world</p>
+      <h1 class="title">Mercure Learning</h1>
+      <p class="subtitle">Applications of the following documentation :
+        <a href="https://symfony.com/doc/current/mercure.html" class="is-underlined">
+          https://symfony.com/doc/current/mercure.html
+        </a> to check how mercure work
+      </p>
     </div>
   </header>
-  <section class="container">
 
-    {# Information about the subscribed URL, discovery URL or fake API URL #}
-    <h2 class="title is-5 my-4">Book subscription urls : </h2>
-    <div class="columns is-multiline">
-      <div class="column is-full">
-        <div class="notification is-info mt-4">
-          <dl>
-          {% for id in 1..3 %}
-            <dt class="has-text-weight-bold">
-              Book {{- id }}
-              (<a href="{{ path('discover_book', {id}) }}">jsonld</a> | <a href="{{ path('get_book', {id}) }}">API</a>):
-            </dt>
-            <dd>
-              {{- mercure('https://example.com/books/'~id)
-                |json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG'))|raw
-              -}}</dd>
-          {% endfor %}
-          </dl>
-        </div>
-      </div>
-    </div>
-
-    {# The Public Books (status and links #}
-    <h2 class="title is-5 my-4">Public books: </h2>
-    <div class="columns is-multiline">
-      <div class="column">
-        <ul>
-          {% for id in 1..3 %}
-            <li class="mb-4">
-              Etat de https://example.com/books/{{ id }} :
-              <strong id="books-{{ id }}" data-book-id="{{ id }}">???</strong>
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-      <div class="column">
-        <ul>
-          {% for id in 1..3 %}
-            <li class="mb-4">
-              <ul>
-                <li>
-                  <a href="{{ path('book_status', { id, status: 'out-of-stock' }) }}" target="_blank">
-                    https://example.com/books/{{ id }} : Out of stock.
-                  </a>
-                </li>
-                <li>
-                  <a href="{{ path('book_status', { id, status: 'in-stock' }) }}" target="_blank">
-                    https://example.com/books/{{ id }}: In Stock
-                  </a>
-                </li>
-              </ul>
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-    </div>
-
-    {# The private Books (status and links #}
-    <h2 class="title is-5 my-4">Private books: </h2>
-    <div class="columns is-multiline">
-      <div class="column">
-        <ul>
-          <li class="mb-4">
-            Etat de https://example.com/private-books/1 :
-            <strong id="private-books-1" data-private-book-id="1">Unknow status</strong>
-          </li>
-        </ul>
-      </div>
-      <div class="column">
-        <ul>
-          <li class="mb-4">
-            <ul>
-              <li>
-                <a href="{{ path('private_book_status', { id: 1, status: 'out-of-stock' }) }}" target="_blank">
-                  https://example.com/private-books/1 : Out of stock.
-                </a>
-              </li>
-              <li>
-                <a href="{{ path('private_book_status', { id: 1, status: 'in-stock' }) }}" target="_blank">
-                  https://example.com/private-books/1: In Stock
-                </a>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </section>
 {% endblock content %}
 
 
 {% block javascript %}
-<script>
-  // Simple subscribing
- const eventSource = new EventSource("{{ mercure('https://example.com/books/1')|escape('js') }}");
-  const firstBookStatus = document.getElementById("books-1");
-
-  eventSource.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    firstBookStatus.innerHTML = data.status;
-  };
-
-  // Multiple subscribing subscribing
-  const bookStatus = Array.from(document.querySelectorAll("[data-book-id]"));
-  const eventSources = new EventSource("{{ mercure([
-    'https://example.com/books/2',
-    'https://example.com/books/3',
-  ])|escape('js') }}");
-
-
-  eventSources.onmessage = (event) => {
-    const {id, status} = JSON.parse(event.data);
-
-    const book = bookStatus.filter((book) => parseInt(book.dataset.bookId, 10) === id).pop();
-    if (book) book.innerHTML = status;
-  };
-
-  // Fetch information about the book
-  fetch('/books/1.jsonld') // Has Link: <https://hub.example.com/.well-known/mercure>; rel="mercure"
-    .then(response => {
-        console.log(response)
-        // Extract the hub URL from the Link header
-        const hubUrl = response.headers.get('Link').match(/<([^>]+)>;\s+rel=(?:mercure|"[^"]*mercure[^"]*")/)[1];
-        console.log(hubUrl);
-
-        // Append the topic(s) to subscribe as query parameter
-        const hub = new URL(hubUrl, window.origin);
-        hub.searchParams.append('topic', 'https://example.com/books/1'); // the topic should be the @id from '/books/1.jsonld'
-        console.log(hub);
-
-        // Subscribe to updates
-        const eventSource = new EventSource(hub);
-        eventSource.onmessage = event => console.log(event.data);
-    });
-
-
-    // Simple private subscribing
-    const eventPrivateSource = new EventSource(
-      "{{ mercure('https://example.com/private-books/1')|escape('js') }}",
-      { withCredentials: false }
-    );
-
-    const firstPrivateBookStatus = document.getElementById("private-books-1");
-
-    eventPrivateSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      firstPrivateBookStatus.innerHTML = data.status;
-    };
-</script>
 {% endblock %}
