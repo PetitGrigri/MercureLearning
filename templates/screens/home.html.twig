@@ -6,22 +6,28 @@
 {% block content %}
   <header class="hero is-medium is-primary">
     <div class="hero-body">
-      <p class="title">Accueil</p>
+      <h1 class="title">Accueil</h1>
       <p class="subtitle">Hello world</p>
     </div>
   </header>
   <section class="container">
     <div class="columns is-multiline">
       <div class="column is-full">
-        <div class="notification is-info">
-          Topic mercure (Book 1):
-          {{ mercure('https://example.com/books/1')
-          |json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG'))|raw -}}
-        </div>
-        <div class="notification is-info">
-          Topic mercure (Book 2):
-          {{ mercure('https://example.com/books/2')
-          |json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG'))|raw -}}
+
+        <div class="notification is-info mt-4">
+          <h2 class="title is-5">Book subscription urls : </h2>
+          <dl>
+          {% for id in 1..3 %}
+            <dt class="has-text-weight-bold">
+              Book {{- id }}
+              (<a href="{{ path('discover_book', {id}) }}">jsonld</a> | <a href="{{ path('get_book', {id}) }}">API</a>):
+            </dt>
+            <dd>
+              {{- mercure('https://example.com/books/1')
+                |json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_HEX_TAG'))|raw
+              -}}</dd>
+          {% endfor %}
+          </dl>
         </div>
       </div>
 
@@ -46,8 +52,8 @@
                   </a>
                 </li>
                 <li>
-                  <a href="{{ path('book_status', { id, status: 'available' }) }}" target="_blank">
-                    https://example.com/books/{{ id }}: Available
+                  <a href="{{ path('book_status', { id, status: 'in-stock' }) }}" target="_blank">
+                    https://example.com/books/{{ id }}: In Stock
                   </a>
                 </li>
               </ul>
@@ -58,10 +64,12 @@
     </div>
   </section>
 {% endblock content %}
+
+
 {% block javascript %}
 <script>
   // Simple subscribing
-  const eventSource = new EventSource("{{ mercure('https://example.com/books/1')|escape('js') }}");
+ const eventSource = new EventSource("{{ mercure('https://example.com/books/1')|escape('js') }}");
   const firstBookStatus = document.getElementById("books-1");
 
   eventSource.onmessage = (event) => {
@@ -74,7 +82,7 @@
   const eventSources = new EventSource("{{ mercure([
     'https://example.com/books/2',
     'https://example.com/books/3',
-    ])|escape('js') }}");
+  ])|escape('js') }}");
 
 
   eventSources.onmessage = (event) => {
@@ -83,5 +91,23 @@
     const book = bookStatus.filter((book) => parseInt(book.dataset.bookId, 10) === id).pop();
     if (book) book.innerHTML = status;
   };
+
+  // Fetch information about the book
+  fetch('/books/1.jsonld') // Has Link: <https://hub.example.com/.well-known/mercure>; rel="mercure"
+    .then(response => {
+        console.log(response)
+        // Extract the hub URL from the Link header
+        const hubUrl = response.headers.get('Link').match(/<([^>]+)>;\s+rel=(?:mercure|"[^"]*mercure[^"]*")/)[1];
+        console.log(hubUrl);
+
+        // Append the topic(s) to subscribe as query parameter
+        const hub = new URL(hubUrl, window.origin);
+        hub.searchParams.append('topic', 'https://example.com/books/1'); // the topic should be the @id from the json-ld
+        console.log(hub);
+
+        // Subscribe to updates
+        const eventSource = new EventSource(hub);
+        eventSource.onmessage = event => console.log(event.data);
+    });
 </script>
 {% endblock %}

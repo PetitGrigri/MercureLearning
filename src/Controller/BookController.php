@@ -10,11 +10,14 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class BookController extends AbstractController
 {
+    const AVAILABLE_STATUS = ['InStock', 'OutOfStock'];
+
+    // We should use a PUT as http method, but we use GET to simplify the learning process
     #[Route(path: '/books/{id}/{status}', name: 'book_status', requirements: [
         'id' => '\d+',
-        'status' => 'available|out-of-stock'
+        'status' => 'in-stock|out-of-stock'
     ])]
-    public function publishBookStatus(
+    public function updateBookStatus(
         HubInterface $hub,
         int $id,
         string $status,
@@ -24,15 +27,28 @@ class BookController extends AbstractController
             json_encode([
                 'id' => $id,
                 'status' => match ($status) {
-                    'available' => 'Available',
-                    'out-of-stock' => 'Out of Scope',
+                    'in-stock' => 'InStock',
+                    'out-of-stock' => 'OutOfStock',
                     default => 'Unknown'
                 }
             ])
         );
-
         $hub->publish($update);
 
-        return new Response('published!');
+        return new Response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route(path: '/books/{id}', name: 'get_book', requirements: [
+        'id' => '\d+',
+        'status' => 'in-stock|out-of-stock'
+    ])]
+    public function getBook(
+        HubInterface $hub,
+        int $id
+    ): Response {
+        return $this->json([
+            'id' => $id,
+            'status' => self::AVAILABLE_STATUS[array_rand(self::AVAILABLE_STATUS)],
+        ]);
     }
 }
